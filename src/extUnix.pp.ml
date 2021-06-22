@@ -1305,6 +1305,22 @@ external timegm : Unix.tm -> float = "caml_extunix_timegm"
 
 ]
 
+[%%have NANOSLEEP
+
+(** [nanosleep req rem] where [req] and [rem] maps to [timespec]
+   structures suspends the execution of the calling thread unitl at
+   least the time specified in [req] has elapsed.
+
+  If the call is interruped by a signal handler, [nanosleep] returns
+  [false] and writes the remaining time into [rem] unless [rem] is
+  [None].
+
+  @return [true] if the call suceeded or [false] if it was
+   interrupted by a signal handler.  *)
+external nanosleep : (float * int) -> (float * int) option -> bool = "caml_extunix_nanosleep"
+
+]
+
 [%%have PTS
 
 (**

@@ -2,6 +2,7 @@
 #define EXTUNIX_WANT_STRTIME
 #define EXTUNIX_WANT_TIMEZONE
 #define EXTUNIX_WANT_TIMEGM
+#define EXTUNIX_WANT_NANOSLEEP
 #include "config.h"
 
 
@@ -174,6 +175,34 @@ CAMLprim value caml_extunix_timegm(value v_t)
 #endif
 
   CAMLreturn(caml_copy_double(t));
+}
+
+#endif
+
+#if defined(EXTUNIX_HAVE_NANOSLEEP)
+
+CAMLprim value caml_extunix_nanosleep(value v_req, value v_rem)
+{
+  CAMLparam2(v_req, v_rem);
+
+  struct timespec req = {
+    .tv_sec = (time_t) Double_val(Field(v_req, 0)),
+    .tv_nsec = Long_val(Field(v_req, 1))
+  };
+  struct timespec rem;
+
+  if (0 != nanosleep(&req, &rem)) {
+    if (errno == EINTR) {
+      if (Is_some(v_rem)) {
+        Store_field(Some_val(v_rem), 0, caml_copy_double((double) rem.tv_nsec));
+        Store_field(Some_val(v_rem), 1, Val_long(rem.tv_nsec));
+      }
+      CAMLreturn(Val_false);
+    } else {
+      unix_error(errno, "nanosleep", Nothing);
+    }
+  }
+  CAMLreturn(Val_true);
 }
 
 #endif

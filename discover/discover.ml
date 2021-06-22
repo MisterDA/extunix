@@ -344,6 +344,7 @@ let features =
       [ I "time.h"; S"timegm"; ];
       [ I "time.h"; Ldlib ("cc", "-lucrtbase"); S"_mkgmtime" ];
     ];
+    "NANOSLEEP", L[ I "time.h"; S "nanosleep"];
     "PTS", L[
       fd_int;
       I "fcntl.h"; I "stdlib.h";
